@@ -1,0 +1,37 @@
+[
+  {
+    "instruction": "Provide personalized golf swing feedback based on quality scores and golf instruction principles.",
+    "input": "Area: setup_quality\nCurrent Score: 0.45\nTarget Score: 0.75\nAll Quality Scores: ['0.45', '0.72', '0.68', '0.65', '0.70', '0.73', '0.69', '0.71']\nSwing Type: balanced_swing",
+    "output": "WHAT SHOULD HAPPEN (Ideal/Expected):\nSetup Quality (stance, posture, alignment). A sound setup creates consistency before the swing even starts. Feet should be shoulder-width apart, spine tilted slightly forward from the hips, arms hanging naturally, and alignment square to the target.\n\nWHY IT MATTERS:\nA poor setup forces compensations later in the swing. Even elite swings break down if posture or alignment is incorrect.\n\nWHAT IS HAPPENING (Current Issue):\nYour setup quality score is 45.0%, suggesting instability or misalignment at address. This is likely affecting balance and swing plane.\n\nCOMMON FAULTS:\n• Rounded shoulders or excessive knee bend\n• Ball too far forward or back\n• Open or closed alignment\n\nWHAT TO DO (Actionable Steps):\n• Use an alignment stick along your toes\n• Practice mirror setup checks before every session\n• Rehearse posture without a club\n\nFEEL / CUE:\n\"Athletic and tall, arms hanging freely\"\n\nPROGRESS CHECK:\nHold your setup for 5 seconds without tension or wobble before swinging."
+  },
+
+  {
+    "instruction": "Provide personalized golf swing feedback based on quality scores and golf instruction principles.",
+    "input": "Area: tempo_rhythm\nCurrent Score: 0.38\nTarget Score: 0.68\nAll Quality Scores: ['0.70', '0.38', '0.65', '0.72', '0.68', '0.75', '0.69', '0.71']\nSwing Type: power_swing",
+    "output": "WHAT SHOULD HAPPEN (Ideal/Expected):\nTempo & Rhythm should feel smooth and repeatable. The backswing should be controlled, with a gradual transition into the downswing.\n\nWHY IT MATTERS:\nPower comes from sequencing, not speed. Rushed tempo disrupts timing and reduces strike quality.\n\nWHAT IS HAPPENING (Current Issue):\nYour tempo score of 38.0% indicates rushing the transition or jerky acceleration.\n\nCOMMON FAULTS:\n• Snatching the club away\n• Over-accelerating from the top\n• No pause at transition\n\nWHAT TO DO (Actionable Steps):\n• Count \"1-2\" back, \"3\" down\n• Swing at 70% speed for full sessions\n• Practice with metronome tempo drills\n\nFEEL / CUE:\n\"Smooth back — fast through\"\n\nPROGRESS CHECK:\nBall contact improves before distance increases."
+  },
+
+  {
+    "instruction": "Provide personalized golf swing feedback based on quality scores and golf instruction principles.",
+    "input": "Area: weight_shift\nCurrent Score: 0.52\nTarget Score: 0.82\nAll Quality Scores: ['0.68', '0.75', '0.52', '0.70', '0.65', '0.72', '0.69', '0.71']\nSwing Type: precision_swing",
+    "output": "WHAT SHOULD HAPPEN (Ideal/Expected):\nWeight should load into the trail side on the backswing, then move decisively onto the lead foot during the downswing. At impact, most weight is forward.\n\nWHY IT MATTERS:\nProper weight shift improves compression, consistency, and directional control.\n\nWHAT IS HAPPENING (Current Issue):\nYour score of 52.0% suggests hanging back or sliding instead of rotating.\n\nCOMMON FAULTS:\n• Staying on back foot at impact\n• Lateral slide instead of rotation\n\nWHAT TO DO (Actionable Steps):\n• Step-through drill\n• Hit half shots with feet together\n• Pause at the top and shift before swinging\n\nFEEL / CUE:\n\"Pressure into lead heel\"\n\nPROGRESS CHECK:\nDivots start appearing in front of the ball."
+  },
+
+  {
+    "instruction": "Provide personalized golf swing feedback based on quality scores and golf instruction principles.",
+    "input": "Area: body_rotation\nCurrent Score: 0.65\nTarget Score: 0.85\nAll Quality Scores: ['0.72', '0.68', '0.75', '0.65', '0.70', '0.73', '0.69', '0.71']\nSwing Type: balanced_swing",
+    "output": "WHAT SHOULD HAPPEN (Ideal/Expected):\nShoulders rotate fully on the backswing while hips resist slightly. Downswing starts from the ground up.\n\nWHY IT MATTERS:\nRotation creates speed while maintaining control. Arms alone cannot generate consistent power.\n\nWHAT IS HAPPENING (Current Issue):\nYour score of 65.0% suggests limited shoulder turn or early hip spin.\n\nCOMMON FAULTS:\n• All-arms swing\n• Hips firing too early\n\nWHAT TO DO (Actionable Steps):\n• Cross-arm rotation drills\n• Chair or wall hip-depth drill\n\nFEEL / CUE:\n\"Turn shoulders behind the ball\"\n\nPROGRESS CHECK:\nMore effortless distance with same swing speed."
+  },
+
+  {
+    "instruction": "Provide personalized golf swing feedback based on quality scores and golf instruction principles.",
+    "input": "Area: followthrough\nCurrent Score: 0.42\nTarget Score: 0.72\nAll Quality Scores: ['0.70', '0.68', '0.65', '0.72', '0.42', '0.73', '0.69', '0.71']\nSwing Type: power_swing",
+    "output": "WHAT SHOULD HAPPEN (Ideal/Expected):\nA full, balanced finish with chest facing target and club wrapped around the body.\n\nWHY IT MATTERS:\nA poor follow-through usually indicates deceleration or balance issues earlier in the swing.\n\nWHAT IS HAPPENING (Current Issue):\nYour score of 42.0% suggests cutting the swing short or losing balance.\n\nCOMMON FAULTS:\n• Stopping arms after impact\n• Falling backward\n\nWHAT TO DO (Actionable Steps):\n• Hold finish drill (3 seconds)\n• Swing through to a high target\n\nFEEL / CUE:\n\"Swing to the finish\"\n\nPROGRESS CHECK:\nFinish position can be held without movement."
+  },
+
+  {
+    "instruction": "Provide personalized golf swing feedback based on quality scores and golf instruction principles.",
+    "input": "Area: balance\nCurrent Score: 0.58\nTarget Score: 0.88\nAll Quality Scores: ['0.72', '0.68', '0.75', '0.70', '0.65', '0.73', '0.58', '0.71']\nSwing Type: precision_swing",
+    "output": "WHAT SHOULD HAPPEN (Ideal/Expected):\nYou should remain centered during the swing and finish fully balanced on the lead foot.\n\nWHY IT MATTERS:\nBalance is the indicator of correct sequencing and efficient motion.\n\nWHAT IS HAPPENING (Current Issue):\nYour score of 58.0% indicates instability, possibly from poor weight shift or tempo.\n\nCOMMON FAULTS:\n• Excessive sway\n• Over-swinging\n\nWHAT TO DO (Actionable Steps):\n• One-leg finish drill\n• Slow-motion swings\n\nFEEL / CUE:\n\"Swing within yourself\"\n\nPROGRESS CHECK:\nNo foot movement after impact."
+  }
+]

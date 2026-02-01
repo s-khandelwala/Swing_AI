@@ -1,0 +1,329 @@
+{
+    "drills": [
+      {
+        "name": "Towel Under Arms Connection Drill",
+        "description": "Place a golf towel under both armpits and make swings without letting it fall. This forces your arms to stay connected to your body and promotes proper body rotation rather than just arm swing.",
+        "categories": ["full_swing", "connection", "body_rotation"],
+        "errors_fixed": [
+          "slice",
+          "arms_disconnecting",
+          "over_the_top",
+          "lack_of_body_rotation",
+          "chicken_wing"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=C29fOC52Rt4"
+      },
+      {
+        "name": "Towel Behind Ball Drill",
+        "description": "Place a towel 3-5 inches behind the golf ball. The goal is to miss the towel completely while hitting the ball, promoting ball-first contact and a proper descending angle of attack.",
+        "categories": ["iron_play", "ball_striking", "contact"],
+        "errors_fixed": [
+          "fat_shots",
+          "thin_shots",
+          "hitting_behind_ball",
+          "poor_angle_of_attack",
+          "inconsistent_contact"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=DbFvhUt8Rwg"
+      },
+      {
+        "name": "Alignment Stick Swing Path Drill",
+        "description": "Place an alignment stick in the ground at an angle matching your club shaft, just outside the target line. If you swing over-the-top, you'll hit the stick. This trains an inside-out swing path.",
+        "categories": ["swing_path", "full_swing", "ball_flight"],
+        "errors_fixed": [
+          "over_the_top",
+          "outside_in_path",
+          "slice",
+          "pull_shots",
+          "poor_swing_plane"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=SAdZMsaXeQk"
+      },
+      {
+        "name": "Alignment Stick Hip Rotation Drill",
+        "description": "Place an alignment stick through your belt loops. Make practice swings while watching how much your hips rotate in the backswing and downswing. This provides visual feedback for proper hip movement.",
+        "categories": ["hip_rotation", "body_movement", "full_swing"],
+        "errors_fixed": [
+          "hip_sliding",
+          "lack_of_hip_turn",
+          "poor_weight_transfer",
+          "loss_of_power",
+          "early_extension"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=2lF0sGf3VBA"
+      },
+      {
+        "name": "Pump Drill (Lag Builder)",
+        "description": "Take the club to the top of your backswing and pause. During the transition, increase your wrist angle (downcock) while shifting your weight forward. Pump 2-3 times before swinging through. This builds lag and proper sequencing.",
+        "categories": ["lag", "transition", "sequencing", "power"],
+        "errors_fixed": [
+          "casting",
+          "loss_of_lag",
+          "early_release",
+          "poor_transition",
+          "lack_of_power"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=lFQb_IFJaAU"
+      },
+      {
+        "name": "Split Hands Drill",
+        "description": "Separate your hands on the grip by 2-3 inches. Make practice swings focusing on maintaining the connection between hands, arms, and body. This promotes proper hand-arm coordination.",
+        "categories": ["connection", "tempo", "coordination"],
+        "errors_fixed": [
+          "disconnected_swing",
+          "poor_coordination",
+          "inconsistent_tempo",
+          "timing_issues",
+          "over_swinging"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=FKqwXTXxNXg"
+      },
+      {
+        "name": "One Arm Trail Hand Drill",
+        "description": "Hit shots using only your trail hand (right hand for righties). Start with small pitch shots, focusing on proper wrist hinge and club release. This builds feel and strength.",
+        "categories": ["short_game", "pitching", "feel"],
+        "errors_fixed": [
+          "poor_release",
+          "lack_of_wrist_hinge",
+          "stiff_wrist_action",
+          "bouncing_shots",
+          "poor_touch"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=fZfGHiZF_1I"
+      },
+      {
+        "name": "Step Through Drill",
+        "description": "Hit shots while stepping through with your trail foot toward the target after impact. This exaggerates proper weight transfer and ensures you're rotating through the ball.",
+        "categories": ["weight_transfer", "finish_position", "full_swing"],
+        "errors_fixed": [
+          "hanging_back",
+          "poor_weight_transfer",
+          "lack_of_rotation",
+          "blocking_shots",
+          "weak_finish"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=XD3hLxFJJuQ"
+      },
+      {
+        "name": "Feet Together Drill",
+        "description": "Hit shots with your feet only 2-3 inches apart. This eliminates lower body excess movement and helps you find pure contact through better balance and arm-body coordination.",
+        "categories": ["balance", "ball_striking", "fundamentals"],
+        "errors_fixed": [
+          "excessive_lateral_movement",
+          "swaying",
+          "loss_of_balance",
+          "poor_rhythm",
+          "inconsistent_contact"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=ZTHn09pAchA"
+      },
+      {
+        "name": "Impact Bag Drill",
+        "description": "Hit an impact bag or heavy cushion, focusing on achieving proper impact position: weight forward, hands ahead, hips open. Hold the finish to feel the correct positions.",
+        "categories": ["impact_position", "body_positions", "feel"],
+        "errors_fixed": [
+          "flipping_at_impact",
+          "hanging_back",
+          "scooping",
+          "early_extension",
+          "poor_impact_positions"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=fqQ-d0p1vPc"
+      },
+      {
+        "name": "Gate Drill (Path Training)",
+        "description": "Place two alignment sticks parallel on either side of the ball (toe and heel line). Swing without hitting either stick. This trains proper swing path and center-face contact.",
+        "categories": ["swing_path", "ball_striking", "center_contact"],
+        "errors_fixed": [
+          "over_the_top",
+          "excessive_inside_out",
+          "toe_hits",
+          "heel_hits",
+          "poor_path_control"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=KsrovFJ3o9I"
+      },
+      {
+        "name": "Preset Impact Drill",
+        "description": "Set up in your impact position (weight forward, hands ahead, hips open) then make small swings from there. This ingrains the feeling of proper impact alignments.",
+        "categories": ["impact_position", "feel", "muscle_memory"],
+        "errors_fixed": [
+          "unknown_impact_feel",
+          "flipping_at_impact",
+          "scooping",
+          "hanging_back",
+          "poor_compression"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=bJFhLO7Ug-k"
+      },
+      {
+        "name": "9-3 Drill (Half Swings)",
+        "description": "Make controlled half swings where the lead arm goes from 9 o'clock to 3 o'clock (parallel to ground on both sides). Focus on perfect contact and ball flight before progressing to full swings.",
+        "categories": ["ball_striking", "contact", "fundamentals"],
+        "errors_fixed": [
+          "over_swinging",
+          "poor_contact",
+          "loss_of_control",
+          "timing_issues",
+          "inconsistent_compression"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=2PRNwKfPWNE"
+      },
+      {
+        "name": "Slow Motion Swing Drill",
+        "description": "Make swings at 30-50% speed, focusing on perfect form and positions. Gradually increase speed while maintaining the same quality of movement.",
+        "categories": ["tempo", "mechanics", "feel"],
+        "errors_fixed": [
+          "swinging_too_hard",
+          "loss_of_control",
+          "poor_sequencing",
+          "tension",
+          "inconsistent_mechanics"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=g0UsF4jFPzw"
+      },
+      {
+        "name": "Pause at Top Drill",
+        "description": "Make your normal backswing, then pause for 2-3 seconds at the top before starting down. This eliminates rushing and helps you feel proper positions and start the downswing correctly.",
+        "categories": ["transition", "tempo", "sequencing"],
+        "errors_fixed": [
+          "rushing_transition",
+          "loss_of_lag",
+          "poor_sequencing",
+          "tension",
+          "over_swinging"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=h7ub8K7WFOM"
+      },
+      {
+        "name": "Tee Height Drill (Ball Striking)",
+        "description": "Set up three balls on tees at different heights (low, medium, high). Practice hitting each one cleanly, starting with the high tee and progressing to lower tees. This teaches proper angle of attack.",
+        "categories": ["ball_striking", "angle_of_attack", "contact"],
+        "errors_fixed": [
+          "fat_shots",
+          "thin_shots",
+          "steep_angle_of_attack",
+          "poor_contact",
+          "inconsistent_strikes"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=FGO7Q-xWPDg"
+      },
+      {
+        "name": "Headcover Under Lead Arm Drill",
+        "description": "Place a glove or headcover under your lead armpit. Make full swings while keeping it secure. This flattens the backswing and promotes an inside approach.",
+        "categories": ["connection", "swing_path", "backswing"],
+        "errors_fixed": [
+          "flying_lead_elbow",
+          "disconnected_backswing",
+          "over_the_top",
+          "steep_backswing",
+          "loss_of_connection"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=3DnQJQz9q9Y"
+      },
+      {
+        "name": "Brush the Grass Drill",
+        "description": "Without a ball, make practice swings focusing on brushing the grass at the exact same spot each time. This trains consistent low point and proper weight transfer.",
+        "categories": ["consistency", "low_point_control", "ball_striking"],
+        "errors_fixed": [
+          "inconsistent_low_point",
+          "fat_shots",
+          "thin_shots",
+          "poor_weight_transfer",
+          "hitting_behind_ball"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=xtFXd6kzj0k"
+      },
+      {
+        "name": "Baseball Drill (Rotation)",
+        "description": "Set a ball on a high tee (chest height) and make baseball-style swings. This exaggerates proper body rotation and helps you feel the correct turn through the ball.",
+        "categories": ["body_rotation", "feel", "power"],
+        "errors_fixed": [
+          "lack_of_rotation",
+          "all_arms_swing",
+          "poor_body_turn",
+          "loss_of_power",
+          "blocking_shots"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=AQTqAkKcR1s"
+      },
+      {
+        "name": "Trail Arm Only Backswing Drill",
+        "description": "Take your backswing using only your trail arm while letting your lead arm hang. This teaches proper trail arm structure and prevents overswinging.",
+        "categories": ["backswing", "trail_arm", "swing_length"],
+        "errors_fixed": [
+          "over_swinging",
+          "poor_trail_arm_structure",
+          "loss_of_width",
+          "inconsistent_backswing",
+          "steep_backswing"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=EM7gL9bxqN0"
+      },
+      {
+        "name": "Cross the Line Fix Drill",
+        "description": "Use alignment sticks to create a target line plane. Practice keeping the club shaft parallel to this line at the top of your backswing to prevent crossing the line.",
+        "categories": ["backswing", "swing_plane", "consistency"],
+        "errors_fixed": [
+          "crossing_the_line",
+          "steep_downswing",
+          "inconsistent_contact",
+          "poor_plane",
+          "over_the_top"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=T4Qgcr0aF0c"
+      },
+      {
+        "name": "Shaft Plane Drill",
+        "description": "Place a stick or club along your toe line. In your backswing, keep your club shaft parallel to this stick at hip height. This ensures proper swing plane.",
+        "categories": ["swing_plane", "backswing", "consistency"],
+        "errors_fixed": [
+          "poor_swing_plane",
+          "too_flat_backswing",
+          "too_steep_backswing",
+          "inconsistent_path",
+          "off_plane_swing"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=7wd9S9d0Nns"
+      },
+      {
+        "name": "Right Elbow at Hip Drill",
+        "description": "In your backswing, focus on keeping your trail elbow close to your right hip. This prevents the club from getting too far behind you and promotes a powerful coil.",
+        "categories": ["backswing", "connection", "power"],
+        "errors_fixed": [
+          "disconnected_backswing",
+          "club_too_deep",
+          "loss_of_power",
+          "inconsistent_plane",
+          "stuck_in_downswing"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=PzOVLPmxI3Y"
+      },
+      {
+        "name": "Heavy Club Drill",
+        "description": "Swing a weighted club or practice with two clubs taped together. This builds strength and trains proper sequencing since you can't muscle the heavy club.",
+        "categories": ["strength", "sequencing", "tempo"],
+        "errors_fixed": [
+          "poor_sequencing",
+          "all_arms_swing",
+          "lack_of_lag",
+          "poor_tempo",
+          "weak_rotation"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=1x_xJaRRJiw"
+      },
+      {
+        "name": "Hit and Hold Drill",
+        "description": "Hit shots and hold your finish position for 5 seconds. This trains balance, proper weight transfer, and a complete rotation through the ball.",
+        "categories": ["balance", "finish_position", "rotation"],
+        "errors_fixed": [
+          "poor_balance",
+          "falling_off_shots",
+          "incomplete_rotation",
+          "hanging_back",
+          "weak_finish"
+        ],
+        "videoUrl": "https://www.youtube.com/watch?v=KTjjfXG_iQs"
+      }
+    ]
+  }

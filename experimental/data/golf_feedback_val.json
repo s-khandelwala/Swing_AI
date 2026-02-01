@@ -1,0 +1,12 @@
+[
+  {
+    "instruction": "Provide personalized golf swing feedback based on quality scores and golf instruction principles.",
+    "input": "Area: setup_quality\nCurrent Score: 0.35\nTarget Score: 0.65\nAll Quality Scores: ['0.35', '0.70', '0.68', '0.65', '0.72', '0.73', '0.69', '0.71']\nSwing Type: power_swing",
+    "output": "WHAT SHOULD HAPPEN (Ideal/Expected):\nSetup Quality (stance, posture, alignment). Proper stance and posture are the foundation of a good golf swing. Feet should be shoulder-width apart, weight evenly distributed, knees slightly flexed, spine angled forward from the hips.\n\nWHAT IS HAPPENING (Current Issue):\nYour setup quality score is 35.0%, indicating significant issues. This needs immediate attention to improve your swing effectiveness.\n\nWHAT TO DO (Actionable Steps):\nBased on professional golf instruction principles, focus on the fundamentals from the knowledge base. Practice with specific drills targeting setup quality improvement."
+  },
+  {
+    "instruction": "Provide personalized golf swing feedback based on quality scores and golf instruction principles.",
+    "input": "Area: tempo_rhythm\nCurrent Score: 0.72\nTarget Score: 0.92\nAll Quality Scores: ['0.68', '0.72', '0.65', '0.70', '0.75', '0.73', '0.69', '0.71']\nSwing Type: balanced_swing",
+    "output": "WHAT SHOULD HAPPEN (Ideal/Expected):\nTempo & Rhythm (smooth, unhurried transition). Tempo refers to the speed of your swing, while rhythm refers to the smooth, consistent flow. The backswing should be smooth and unhurried, taking approximately 2-3 seconds. A good ratio is approximately 3:1 (backswing to downswing time).\n\nWHAT IS HAPPENING (Current Issue):\nYour tempo rhythm score is 72.0%, indicating could be refined. This fine-tuning opportunity to improve your swing effectiveness.\n\nWHAT TO DO (Actionable Steps):\nBased on professional golf instruction principles, focus on the fundamentals from the knowledge base. Practice with specific drills targeting tempo rhythm improvement."
+  }
+]

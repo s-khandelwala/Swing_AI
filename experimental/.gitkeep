@@ -1,0 +1,2 @@
+# This file ensures the experimental directory is tracked by git
+# The experimental folder contains standalone scripts not yet integrated into main codebase
