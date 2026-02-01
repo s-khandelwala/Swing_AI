@@ -336,15 +336,97 @@ class PoseBasedSwingDetector:
         start_threshold = baseline + self.start_motion_threshold * motion_range
         end_threshold = baseline + self.end_motion_threshold * motion_range
         
-        # Detect SWING START: sustained motion after address
+        # Detect SWING START: find where motion starts increasing toward the peak
+        # Simple approach: work backwards from peak, find the local minimum or inflection point
         start_idx = None
-        for i in range(address_end_idx, len(motion_scores) - self.min_sustained_frames):
-            if motion_scores[i] > start_threshold:
-                # Check if motion stays elevated (filters waggles)
-                window = motion_scores[i:i+self.min_sustained_frames]
-                if np.mean(window) > start_threshold:
-                    start_idx = i
-                    break
+        
+        # Find the peak first
+        peak_idx = np.argmax(motion_scores)
+        
+        # Smooth motion for better analysis
+        try:
+            from scipy.ndimage import uniform_filter1d
+            motion_smooth = uniform_filter1d(motion_scores, size=5)
+        except:
+            kernel = np.ones(5) / 5
+            motion_smooth = np.convolve(motion_scores, kernel, mode='same')
+        
+        # Simple approach: find the minimum point before the peak, then find where motion starts rising from there
+        search_start = max(address_end_idx, peak_idx - 60)  # Look back up to 60 frames
+        search_end = peak_idx - 5  # Don't go too close to peak
+        
+        if search_end > search_start:
+            # Find local minimum in the region before the peak
+            search_region = motion_smooth[search_start:search_end]
+            if len(search_region) > 0:
+                local_min_idx = np.argmin(search_region) + search_start
+                
+                # Now work forward from the local minimum to find where motion starts consistently increasing
+                # This is where the swing actually starts
+                for i in range(local_min_idx, min(peak_idx - 3, len(motion_scores) - 1)):
+                    # Look ahead to see if motion is increasing
+                    look_ahead = min(10, peak_idx - i)
+                    if look_ahead < 5:
+                        break
+                    
+                    # Check if motion increases over the next few frames
+                    current_motion = motion_smooth[i]
+                    future_motion = motion_smooth[i+1:min(i+look_ahead+1, len(motion_smooth))]
+                    
+                    if len(future_motion) < 3:
+                        break
+                    
+                    # Motion should increase by a meaningful amount
+                    motion_increase = future_motion[-1] - current_motion
+                    
+                    # Also check that most frames show increase
+                    increases = sum(future_motion[j] < future_motion[j+1] if j+1 < len(future_motion) else False 
+                                   for j in range(len(future_motion)-1))
+                    
+                    # Require: motion increases by at least 10% of range, and at least 50% of frames show increase
+                    if motion_increase > motion_range * 0.10 and increases >= len(future_motion) * 0.5:
+                        # Also verify motion was lower before this point
+                        if i > 3:
+                            prev_motion = motion_smooth[max(0, i-3):i]
+                            if len(prev_motion) > 0 and np.mean(prev_motion) < current_motion * 1.2:
+                                start_idx = i
+                                break
+        
+        # Fallback: if local min approach didn't work, use threshold but require motion to be increasing
+        if start_idx is None:
+            # Compute simple derivative
+            if len(motion_scores) > 1:
+                motion_diff = np.diff(motion_scores)
+            else:
+                motion_diff = np.array([0])
+            
+            # Use a slightly higher threshold to avoid early detections
+            adjusted_threshold = baseline + 0.20 * motion_range  # 20% instead of 15%
+            
+            for i in range(address_end_idx, peak_idx - 5):
+                if i >= len(motion_diff):
+                    continue
+                
+                # Motion should be above threshold
+                if motion_scores[i] > adjusted_threshold:
+                    # And should be increasing
+                    if motion_diff[i] > 0:
+                        # Check next few frames also show increase
+                        if i + 3 < len(motion_diff):
+                            if np.sum(motion_diff[i:i+3] > 0) >= 2:  # At least 2 of 3 increasing
+                                window = motion_scores[i:i+self.min_sustained_frames]
+                                if np.mean(window) > adjusted_threshold:
+                                    start_idx = i
+                                    break
+        
+        # Final fallback: original method
+        if start_idx is None:
+            for i in range(address_end_idx, len(motion_scores) - self.min_sustained_frames):
+                if motion_scores[i] > start_threshold:
+                    window = motion_scores[i:i+self.min_sustained_frames]
+                    if np.mean(window) > start_threshold:
+                        start_idx = i
+                        break
         
         if start_idx is None:
             return None  # Couldn't detect start

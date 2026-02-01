@@ -106,7 +106,7 @@ def rotate_frame(frame, rotation_degrees):
         return frame  # Unknown rotation, return as-is
 
 
-def detect_slowmo_by_peak_sharpness(video_path, swing_start_frame=0, swing_end_frame=None):
+def detect_slowmo_by_peak_sharpness(video_path, swing_start_frame=0, swing_end_frame=None, return_regions=False, return_analysis=False):
     """
     Detect slow-motion by measuring acceleration peak sharpness.
     Uses relative timing (rise width) instead of absolute timing.
@@ -172,6 +172,8 @@ def detect_slowmo_by_peak_sharpness(video_path, swing_start_frame=0, swing_end_f
     
     if len(motion_scores) < 10:
         print("⚠️  Not enough motion data for slow-mo detection")
+        if return_regions:
+            return False, 0.0, 1.0, []
         return False, 0.0, 1.0
     
     motion_scores = np.array(motion_scores)
@@ -195,6 +197,8 @@ def detect_slowmo_by_peak_sharpness(video_path, swing_start_frame=0, swing_end_f
     
     if peak_value < 1e-6:
         print("⚠️  No significant motion detected")
+        if return_regions:
+            return False, 0.0, 1.0, []
         return False, 0.0, 1.0
     
     # Low peak value relative to typical swings might indicate slow-mo
@@ -222,13 +226,38 @@ def detect_slowmo_by_peak_sharpness(video_path, swing_start_frame=0, swing_end_f
             confidence = min(1.0, abs(fall_ratio - 0.15) / 0.15)
             speed_factor = max(1.0, min(4.0, fall_ratio / 0.10))
             
-            print(f"   Peak at frame {peak_idx} (value: {peak_value:.3f}) - at start")
-            print(f"   Fall width: {fall_width} frames ({fall_ratio:.3f} of total)")
-            print(f"   Detection: {'SLOW-MOTION' if is_slowmo else 'REAL-TIME'}")
-            print(f"   Confidence: {confidence:.2f}")
-            print(f"   Estimated speed factor: {speed_factor:.2f}x")
+        print(f"   Peak at frame {peak_idx} (value: {peak_value:.3f}) - at start")
+        print(f"   Fall width: {fall_width} frames ({fall_ratio:.3f} of total)")
+        print(f"   Detection: {'SLOW-MOTION' if is_slowmo else 'REAL-TIME'}")
+        print(f"   Confidence: {confidence:.2f}")
+        print(f"   Estimated speed factor: {speed_factor:.2f}x")
+        
+        # Detect slow-motion regions if requested
+        slow_regions = []
+        if return_regions and is_slowmo:
+            # Find frames with motion below threshold (indicating slow-motion)
+            motion_threshold = motion_mean * 1.5  # Frames with motion below 1.5x mean are likely slow-mo
+            slow_frames = motion_scores < motion_threshold
             
-            return is_slowmo, confidence, speed_factor
+            # Find contiguous regions
+            in_slow_region = False
+            region_start = 0
+            for i, is_slow in enumerate(slow_frames):
+                if is_slow and not in_slow_region:
+                    region_start = i
+                    in_slow_region = True
+                elif not is_slow and in_slow_region:
+                    slow_regions.append((region_start, i - 1))
+                    in_slow_region = False
+            if in_slow_region:
+                slow_regions.append((region_start, len(slow_frames) - 1))
+            
+            # Filter out very small regions (< 5 frames)
+            slow_regions = [(s, e) for s, e in slow_regions if (e - s + 1) >= 5]
+        
+        if return_regions:
+            return is_slowmo, confidence, speed_factor, slow_regions
+        return is_slowmo, confidence, speed_factor
     
     # Normal case: measure rise before peak
     rise_start_indices = np.where(motion_scores[:peak_idx] >= 0.2 * peak_value)[0]
@@ -264,7 +293,58 @@ def detect_slowmo_by_peak_sharpness(video_path, swing_start_frame=0, swing_end_f
         print(f"   Confidence: {confidence:.2f}")
         print(f"   Estimated speed factor: {speed_factor:.2f}x")
         
-        return is_slowmo, confidence, speed_factor
+        # Prepare analysis data if requested
+        analysis_data = None
+        if return_analysis:
+            analysis_data = {
+                'motion_scores': motion_scores,
+                'peak_idx': peak_idx,
+                'peak_value': peak_value,
+                'motion_mean': motion_mean,
+                'motion_std': motion_std,
+                'rise_start': rise_start,
+                'rise_end': rise_end,
+                'rise_width': rise_width,
+                'rise_ratio': rise_ratio,
+                'is_slowmo': is_slowmo,
+                'confidence': confidence,
+                'speed_factor': speed_factor,
+                'method': 'rise_width'
+            }
+        
+        # Detect slow-motion regions if requested
+        slow_regions = []
+        if return_regions and is_slowmo:
+            # Find frames with motion below threshold (indicating slow-motion)
+            motion_threshold = motion_mean * 1.5  # Frames with motion below 1.5x mean are likely slow-mo
+            slow_frames = motion_scores < motion_threshold
+            
+            # Find contiguous regions
+            in_slow_region = False
+            region_start = 0
+            for i, is_slow in enumerate(slow_frames):
+                if is_slow and not in_slow_region:
+                    region_start = i
+                    in_slow_region = True
+                elif not is_slow and in_slow_region:
+                    slow_regions.append((region_start, i - 1))
+                    in_slow_region = False
+            if in_slow_region:
+                slow_regions.append((region_start, len(slow_frames) - 1))
+            
+            # Filter out very small regions (< 5 frames)
+            slow_regions = [(s, e) for s, e in slow_regions if (e - s + 1) >= 5]
+        
+        # Return with appropriate parameters
+        if return_regions:
+            result = (is_slowmo, confidence, speed_factor, slow_regions)
+            if return_analysis:
+                return result + (analysis_data,)
+            return result
+        result = (is_slowmo, confidence, speed_factor)
+        if return_analysis:
+            return result + (analysis_data,)
+        return result
     else:
         # Fallback: use overall motion distribution
         # If motion is very spread out, likely slow-mo
@@ -323,7 +403,65 @@ def detect_slowmo_by_peak_sharpness(video_path, swing_start_frame=0, swing_end_f
         print(f"   Confidence: {confidence:.2f}")
         print(f"   Estimated speed factor: {speed_factor:.2f}x")
         
-        return is_slowmo, confidence, speed_factor
+        # Prepare analysis data if requested
+        analysis_data = None
+        if return_analysis:
+            analysis_data = {
+                'motion_scores': motion_scores,
+                'peak_idx': peak_idx,
+                'peak_value': peak_value,
+                'motion_mean': motion_mean,
+                'motion_std': motion_std,
+                'peak_width_ratio': peak_width_ratio,
+                'low_peak_indicator': low_peak_indicator,
+                'smoothness_indicator': smoothness_indicator,
+                'low_motion_indicator': low_motion_indicator,
+                'slowmo_score': slowmo_score,
+                'is_slowmo': is_slowmo,
+                'confidence': confidence,
+                'speed_factor': speed_factor,
+                'method': 'fallback',
+                'coefficient_of_variation': cv
+            }
+        
+        # Detect slow-motion regions if requested
+        slow_regions = []
+        if return_regions and is_slowmo:
+            # Find frames with motion below threshold (indicating slow-motion)
+            # Use a more conservative threshold for fallback method
+            motion_threshold = motion_mean * 1.2  # Frames with motion below 1.2x mean
+            slow_frames = motion_scores < motion_threshold
+            
+            # Find contiguous regions
+            in_slow_region = False
+            region_start = 0
+            for i, is_slow in enumerate(slow_frames):
+                if is_slow and not in_slow_region:
+                    region_start = i
+                    in_slow_region = True
+                elif not is_slow and in_slow_region:
+                    slow_regions.append((region_start, i - 1))
+                    in_slow_region = False
+            if in_slow_region:
+                slow_regions.append((region_start, len(slow_frames) - 1))
+            
+            # Filter out very small regions (< 5 frames)
+            slow_regions = [(s, e) for s, e in slow_regions if (e - s + 1) >= 5]
+            
+            # If no regions found but slow-mo detected, treat entire video as slow-mo
+            if not slow_regions:
+                slow_regions = [(0, len(motion_scores) - 1)]
+        
+        # Return with appropriate parameters
+        if return_regions:
+            result = (is_slowmo, confidence, speed_factor, slow_regions)
+            if return_analysis:
+                return result + (analysis_data,)
+            return result
+        result = (is_slowmo, confidence, speed_factor)
+        if return_analysis:
+            return result + (analysis_data,)
+        return result
 
 
 def speed_up_slow_motion(video_path, output_path, speed_factor=2.0, slow_regions=None):
@@ -424,7 +562,16 @@ def speed_up_slow_motion(video_path, output_path, speed_factor=2.0, slow_regions
 
 def load_event_detector(model_path='models/swingnet_2000.pth.tar', device='cuda'):
     """Load the trained event detector model."""
+    import os
     print(f"Loading event detector from {model_path}...")
+    
+    # Check if file exists
+    if not os.path.exists(model_path):
+        raise FileNotFoundError(
+            f"Model file not found: {model_path}\n"
+            f"Please check the path. If the path contains spaces or special characters, "
+            f"make sure to quote it in the command line: --model \"{model_path}\""
+        )
     
     model = EventDetector(
         pretrain=True,
@@ -436,11 +583,32 @@ def load_event_detector(model_path='models/swingnet_2000.pth.tar', device='cuda'
     )
     
     # Load checkpoint
-    checkpoint = torch.load(model_path, map_location=device)
+    # Use weights_only=False for compatibility with older PyTorch checkpoints
+    # that may contain optimizer states or other objects
+    checkpoint = torch.load(model_path, map_location=device, weights_only=False)
+    
+    # Extract state dict
     if 'model_state_dict' in checkpoint:
-        model.load_state_dict(checkpoint['model_state_dict'])
+        state_dict = checkpoint['model_state_dict']
     else:
-        model.load_state_dict(checkpoint)
+        state_dict = checkpoint
+    
+    # Try to load with strict=False to handle architecture mismatches
+    # Some checkpoints may have different layer names (e.g., "attention", "regressor" vs "lin")
+    try:
+        model.load_state_dict(state_dict, strict=True)
+    except RuntimeError as e:
+        print(f"⚠️  Warning: Could not load model with strict=True: {e}")
+        print("   Attempting to load with strict=False (ignoring mismatched keys)...")
+        try:
+            model.load_state_dict(state_dict, strict=False)
+            print("   ✅ Loaded model with some keys ignored (architecture mismatch)")
+        except RuntimeError as e2:
+            raise RuntimeError(
+                f"Failed to load model checkpoint. The checkpoint may be from a different model architecture.\n"
+                f"Error: {e2}\n"
+                f"Please ensure you're using the correct model file."
+            ) from e2
     
     model.eval()
     model.to(device)
@@ -1128,6 +1296,368 @@ def annotate_video(video_path, event_frames, event_confidences, output_path):
     print(f"✅ Annotated video saved: {output_path}")
 
 
+def plot_swing_detection_analysis(video_path, swing_start, swing_end, output_path):
+    """
+    Create a graph showing swing detection analysis - motion scores and detected boundaries.
+    
+    Args:
+        video_path: Input video path
+        swing_start: Detected swing start frame
+        swing_end: Detected swing end frame
+        output_path: Path to save the graph
+    """
+    print(f"\n   📈 Creating swing detection analysis graph...")
+    
+    from motion_swing_detector import PoseBasedSwingDetector
+    import cv2
+    
+    detector = PoseBasedSwingDetector()
+    cap = cv2.VideoCapture(video_path)
+    
+    if not cap.isOpened():
+        print("   ⚠️  Could not open video for analysis")
+        return
+    
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    cap.release()
+    
+    # Re-extract motion scores for visualization
+    cap = cv2.VideoCapture(video_path)
+    motion_scores = []
+    frame_indices = []
+    keypoints_prev = None
+    frame_count = 0
+    
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        
+        keypoints = detector._extract_keypoints(frame)
+        if keypoints is not None:
+            if keypoints_prev is not None:
+                motion_score = detector._compute_motion_score(keypoints_prev, keypoints)
+                motion_scores.append(motion_score)
+                frame_indices.append(frame_count)
+            keypoints_prev = keypoints
+        frame_count += 1
+    
+    cap.release()
+    
+    if len(motion_scores) < 10:
+        print("   ⚠️  Not enough motion data for analysis")
+        return
+    
+    motion_scores = np.array(motion_scores)
+    frame_indices = np.array(frame_indices)
+    
+    # Smooth motion scores
+    try:
+        from scipy.ndimage import uniform_filter1d
+        motion_scores_smooth = uniform_filter1d(motion_scores, size=3)
+    except:
+        motion_scores_smooth = motion_scores
+    
+    # Create figure
+    fig, ax = plt.subplots(figsize=(14, 8))
+    
+    # Plot motion scores
+    ax.plot(frame_indices, motion_scores, alpha=0.3, color='gray', label='Raw Motion', linewidth=1)
+    ax.plot(frame_indices, motion_scores_smooth, color='blue', label='Smoothed Motion', linewidth=2)
+    
+    # Mark detected swing boundaries
+    ax.axvline(x=swing_start, color='green', linestyle='--', linewidth=2, label=f'Swing Start (frame {swing_start})')
+    ax.axvline(x=swing_end, color='red', linestyle='--', linewidth=2, label=f'Swing End (frame {swing_end})')
+    
+    # Shade the detected swing region
+    ax.axvspan(swing_start, swing_end, alpha=0.2, color='yellow', label='Detected Swing Region')
+    
+    # Add statistics
+    motion_mean = np.mean(motion_scores)
+    motion_std = np.std(motion_scores)
+    motion_max = np.max(motion_scores)
+    motion_min = np.min(motion_scores)
+    
+    # Add threshold lines (if we can estimate them)
+    baseline = np.median(motion_scores)
+    motion_range = motion_max - baseline
+    start_threshold = baseline + 0.15 * motion_range
+    end_threshold = baseline + 0.10 * motion_range
+    
+    ax.axhline(y=start_threshold, color='orange', linestyle=':', linewidth=1.5, alpha=0.7, label=f'Start Threshold ({start_threshold:.4f})')
+    ax.axhline(y=end_threshold, color='purple', linestyle=':', linewidth=1.5, alpha=0.7, label=f'End Threshold ({end_threshold:.4f})')
+    ax.axhline(y=baseline, color='black', linestyle=':', linewidth=1, alpha=0.5, label=f'Baseline ({baseline:.4f})')
+    
+    # Styling
+    ax.set_xlabel('Frame Number', fontsize=12)
+    ax.set_ylabel('Motion Score', fontsize=12)
+    ax.set_title('Swing Detection Analysis\nMotion Scores and Detected Boundaries', fontsize=14, fontweight='bold')
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc='upper right', fontsize=9)
+    
+    # Add text box with statistics
+    stats_text = (
+        f'Statistics:\n'
+        f'Mean: {motion_mean:.4f}\n'
+        f'Std: {motion_std:.4f}\n'
+        f'Max: {motion_max:.4f}\n'
+        f'Min: {motion_min:.4f}\n'
+        f'Range: {motion_range:.4f}\n'
+        f'Swing Duration: {swing_end - swing_start + 1} frames\n'
+        f'({(swing_end - swing_start + 1) / fps:.2f}s)'
+    )
+    ax.text(0.02, 0.98, stats_text, transform=ax.transAxes,
+           verticalalignment='top', fontsize=9,
+           bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+    
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150, bbox_inches='tight')
+    plt.close()
+    
+    print(f"   ✅ Swing detection graph saved: {output_path}")
+
+
+def plot_slowmo_detection_analysis(analysis_data, output_path):
+    """
+    Create a graph showing slow-motion detection analysis.
+    
+    Args:
+        analysis_data: Dictionary with analysis data from detect_slowmo_by_peak_sharpness
+        output_path: Path to save the graph
+    """
+    print(f"\n   📈 Creating slow-motion detection analysis graph...")
+    
+    if analysis_data is None:
+        print("   ⚠️  No analysis data available")
+        return
+    
+    motion_scores = analysis_data['motion_scores']
+    peak_idx = analysis_data['peak_idx']
+    peak_value = analysis_data['peak_value']
+    motion_mean = analysis_data['motion_mean']
+    motion_std = analysis_data['motion_std']
+    method = analysis_data.get('method', 'unknown')
+    is_slowmo = analysis_data['is_slowmo']
+    confidence = analysis_data['confidence']
+    speed_factor = analysis_data['speed_factor']
+    
+    frames = np.arange(len(motion_scores))
+    
+    # Create figure with subplots
+    fig = plt.figure(figsize=(16, 10))
+    gs = fig.add_gridspec(3, 2, hspace=0.3, wspace=0.3)
+    
+    # Main plot: Motion scores with analysis
+    ax_main = fig.add_subplot(gs[0:2, :])
+    
+    # Plot motion scores
+    ax_main.plot(frames, motion_scores, color='blue', linewidth=2, label='Motion Score', alpha=0.8)
+    
+    # Mark peak
+    ax_main.scatter([peak_idx], [peak_value], color='red', s=200, zorder=5, marker='x', linewidths=3,
+                   label=f'Peak (frame {peak_idx}, value: {peak_value:.4f})')
+    
+    # Mark mean and std
+    ax_main.axhline(y=motion_mean, color='green', linestyle='--', linewidth=2, alpha=0.7, 
+                   label=f'Mean ({motion_mean:.4f})')
+    ax_main.axhline(y=motion_mean + motion_std, color='orange', linestyle=':', linewidth=1.5, alpha=0.7,
+                   label=f'Mean + Std ({motion_mean + motion_std:.4f})')
+    ax_main.axhline(y=motion_mean - motion_std, color='orange', linestyle=':', linewidth=1.5, alpha=0.7,
+                   label=f'Mean - Std ({motion_mean - motion_std:.4f})')
+    
+    # Mark analysis regions based on method
+    if method == 'rise_width' and 'rise_start' in analysis_data and analysis_data['rise_start'] is not None:
+        rise_start = analysis_data['rise_start']
+        rise_end = analysis_data['rise_end']
+        ax_main.axvspan(rise_start, rise_end, alpha=0.2, color='yellow', 
+                      label=f'Rise Width ({rise_end - rise_start} frames)')
+        ax_main.axhline(y=0.2 * peak_value, color='purple', linestyle=':', linewidth=1.5, alpha=0.7,
+                       label=f'20% of Peak ({0.2 * peak_value:.4f})')
+        ax_main.axhline(y=0.8 * peak_value, color='purple', linestyle=':', linewidth=1.5, alpha=0.7,
+                       label=f'80% of Peak ({0.8 * peak_value:.4f})')
+    
+    ax_main.set_xlabel('Frame Number (relative to swing start)', fontsize=11)
+    ax_main.set_ylabel('Motion Score', fontsize=11)
+    ax_main.set_title(f'Slow-Motion Detection Analysis\nDetection: {"SLOW-MOTION" if is_slowmo else "REAL-TIME"} | '
+                     f'Confidence: {confidence:.2f} | Speed Factor: {speed_factor:.2f}x', 
+                     fontsize=13, fontweight='bold')
+    ax_main.grid(True, alpha=0.3)
+    ax_main.legend(loc='upper right', fontsize=9)
+    
+    # Subplot 1: Indicators (for fallback method)
+    ax1 = fig.add_subplot(gs[2, 0])
+    if method == 'fallback':
+        indicators = {
+            'Peak Width Ratio': analysis_data.get('peak_width_ratio', 0),
+            'Low Peak Indicator': analysis_data.get('low_peak_indicator', 0),
+            'Smoothness Indicator': analysis_data.get('smoothness_indicator', 0),
+            'Low Motion Indicator': analysis_data.get('low_motion_indicator', 0),
+        }
+        slowmo_score = analysis_data.get('slowmo_score', 0)
+        
+        colors = ['red' if v > 0.5 else 'blue' for v in indicators.values()]
+        bars = ax1.bar(indicators.keys(), indicators.values(), color=colors, alpha=0.7)
+        ax1.axhline(y=0.5, color='black', linestyle='--', linewidth=1, label='Threshold')
+        ax1.set_ylabel('Indicator Value', fontsize=10)
+        ax1.set_title(f'Detection Indicators\nSlowmo Score: {slowmo_score:.3f}', fontsize=11)
+        ax1.set_ylim([0, 1])
+        ax1.legend()
+        ax1.tick_params(axis='x', rotation=45)
+    else:
+        # For rise_width method, show rise analysis
+        if 'rise_ratio' in analysis_data:
+            ax1.text(0.5, 0.5, f'Rise Ratio: {analysis_data["rise_ratio"]:.3f}\n'
+                              f'Rise Width: {analysis_data.get("rise_width", 0)} frames\n'
+                              f'Threshold: 0.20\n'
+                              f'{"Above threshold" if analysis_data["rise_ratio"] > 0.20 else "Below threshold"}',
+                    transform=ax1.transAxes, ha='center', va='center',
+                    fontsize=11, bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.8))
+        ax1.set_title('Rise Analysis', fontsize=11)
+        ax1.axis('off')
+    
+    # Subplot 2: Statistics
+    ax2 = fig.add_subplot(gs[2, 1])
+    stats_text = (
+        f'Motion Statistics:\n'
+        f'Peak Value: {peak_value:.4f}\n'
+        f'Mean: {motion_mean:.4f}\n'
+        f'Std: {motion_std:.4f}\n'
+        f'Peak Index: {peak_idx}\n'
+        f'Total Frames: {len(motion_scores)}\n'
+    )
+    if method == 'fallback':
+        stats_text += f'Coefficient of Variation: {analysis_data.get("coefficient_of_variation", 0):.4f}\n'
+    stats_text += f'\nDetection Result:\n'
+    stats_text += f'Is Slow-Motion: {is_slowmo}\n'
+    stats_text += f'Confidence: {confidence:.2f}\n'
+    stats_text += f'Speed Factor: {speed_factor:.2f}x\n'
+    stats_text += f'Method: {method}'
+    
+    ax2.text(0.1, 0.5, stats_text, transform=ax2.transAxes,
+            verticalalignment='center', fontsize=10,
+            bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+    ax2.set_title('Statistics & Detection Result', fontsize=11)
+    ax2.axis('off')
+    
+    plt.savefig(output_path, dpi=150, bbox_inches='tight')
+    plt.close()
+    
+    print(f"   ✅ Slow-motion detection graph saved: {output_path}")
+
+
+def extract_phase_videos(video_path, event_frames, output_base_path):
+    """
+    Extract separate videos for each swing phase.
+    
+    Args:
+        video_path: Input video path
+        event_frames: List of 8 event frame numbers
+        output_base_path: Base path for output videos (e.g., "output" -> "output_Address.mp4", etc.)
+    """
+    print(f"\n{'='*60}")
+    print("Extracting phase videos...")
+    print(f"{'='*60}")
+    
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        raise ValueError(f"Could not open video: {video_path}")
+    
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    
+    # Determine phase boundaries using the same logic as annotation
+    def get_phase_range(phase_idx):
+        """Get the frame range for a specific phase."""
+        if phase_idx < 4:  # Pre-Top (0-3: Address, Takeaway, Backswing, Top)
+            prev_frame = event_frames[phase_idx-1] if phase_idx > 0 else -1
+            start_frame = prev_frame + 1
+            end_frame = event_frames[phase_idx]
+            return start_frame, end_frame
+        else:  # Post-Top (4-7: Downswing, Impact, Follow-through, Finish)
+            start_frame = event_frames[phase_idx]
+            next_frame = event_frames[phase_idx+1] if phase_idx < 7 else total_frames
+            end_frame = next_frame - 1
+            return start_frame, end_frame
+    
+    # Create a video writer for each phase
+    phase_videos = {}
+    for phase_idx in range(8):
+        phase_name = EVENT_NAMES[phase_idx]
+        output_path = f"{output_base_path}_{phase_name}.mp4"
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+        if not out.isOpened():
+            cap.release()
+            raise ValueError(f"Could not create output video: {output_path}")
+        phase_videos[phase_idx] = {
+            'writer': out,
+            'path': output_path,
+            'name': phase_name,
+            'start': None,
+            'end': None,
+            'frame_count': 0
+        }
+    
+    # Determine phase ranges
+    for phase_idx in range(8):
+        start_frame, end_frame = get_phase_range(phase_idx)
+        phase_videos[phase_idx]['start'] = start_frame
+        phase_videos[phase_idx]['end'] = end_frame
+    
+    # Read video and write frames to appropriate phase videos
+    frame_num = 0
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        
+        # Determine which phase this frame belongs to
+        phase_idx = None
+        for i in range(8):
+            start = phase_videos[i]['start']
+            end = phase_videos[i]['end']
+            if start <= frame_num <= end:
+                phase_idx = i
+                break
+        
+        # Write frame to the appropriate phase video
+        if phase_idx is not None:
+            phase_videos[phase_idx]['writer'].write(frame)
+            phase_videos[phase_idx]['frame_count'] += 1
+        
+        frame_num += 1
+        
+        if frame_num % 50 == 0:
+            print(f"  Processed {frame_num}/{total_frames} frames...")
+    
+    cap.release()
+    
+    # Close all video writers and report
+    phase_outputs = []
+    for phase_idx in range(8):
+        phase_videos[phase_idx]['writer'].release()
+        frame_count = phase_videos[phase_idx]['frame_count']
+        start = phase_videos[phase_idx]['start']
+        end = phase_videos[phase_idx]['end']
+        path = phase_videos[phase_idx]['path']
+        name = phase_videos[phase_idx]['name']
+        
+        if frame_count > 0:
+            phase_outputs.append(path)
+            print(f"  ✅ {name:15s}: {path} ({frame_count} frames, {start}-{end})")
+        else:
+            # Remove empty video files
+            if osp.exists(path):
+                os.remove(path)
+            print(f"  ⚠️  {name:15s}: No frames (skipped)")
+    
+    print(f"\n✅ Extracted {len(phase_outputs)} phase videos")
+    return phase_outputs
+
+
 def main():
     parser = argparse.ArgumentParser(description='Analyze golf swing video with pose-based cropping and event detection')
     parser.add_argument('--video', type=str, required=True, help='Input video path')
@@ -1172,6 +1702,13 @@ def main():
             start_frame, end_frame, confidence = detector.detect_swing_boundaries(args.video)
             print(f"✅ Detected swing: frames {start_frame}-{end_frame} (confidence: {confidence:.3f})")
             
+            # Create swing detection analysis graph
+            swing_graph_path = osp.splitext(args.output)[0] + '_swing_detection.png'
+            try:
+                plot_swing_detection_analysis(args.video, start_frame, end_frame, swing_graph_path)
+            except Exception as e:
+                print(f"   ⚠️  Could not create swing detection graph: {e}")
+            
             # Crop video
             cropped_video = f"{osp.splitext(args.video)[0]}_cropped_temp.mp4"
             crop_video(args.video, start_frame, end_frame, cropped_video)
@@ -1194,9 +1731,16 @@ def main():
     # Step 1.5: Detect and speed up slow-motion (if requested)
     if args.detect_slowmo:
         try:
-            is_slowmo, confidence, speed_factor = detect_slowmo_by_peak_sharpness(
-                cropped_video, swing_start_frame=0, swing_end_frame=None
+            is_slowmo, confidence, speed_factor, analysis_data = detect_slowmo_by_peak_sharpness(
+                cropped_video, swing_start_frame=0, swing_end_frame=None, return_analysis=True
             )
+            
+            # Create slow-motion detection analysis graph
+            slowmo_graph_path = osp.splitext(args.output)[0] + '_slowmo_detection.png'
+            try:
+                plot_slowmo_detection_analysis(analysis_data, slowmo_graph_path)
+            except Exception as e:
+                print(f"   ⚠️  Could not create slow-motion detection graph: {e}")
             
             if is_slowmo and confidence > 0.3:
                 print(f"\n{'='*60}")
@@ -1243,6 +1787,10 @@ def main():
     print(f"{'='*60}")
     
     annotate_video(cropped_video, event_frames, event_confidences, args.output)
+    
+    # Step 5: Extract phase videos
+    output_base = osp.splitext(args.output)[0]
+    phase_videos = extract_phase_videos(cropped_video, event_frames, output_base)
     
     # Cleanup temporary files
     temp_cropped = f"{osp.splitext(args.video)[0]}_cropped_temp.mp4"
